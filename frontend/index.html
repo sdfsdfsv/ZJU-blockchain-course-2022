@@ -1,53 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Voting App</title>
-    
-  </head>
-  <!-- 简陋的前端 -->
-  <body bgcolor=#EEEEEE>
-    <div style="position:relative;left:0%;top:0px">
-      💻Please connet first<button id="connect" >connect</button>
-      <div style="position:absolute;left:40%;top:0px">
-        💡Please register once<button id="reg">register</button>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Voting App</title>
+
+</head>
+
+<body bgcolor=#EEEEEE>
+  <div style="position:relative;left:0%;top:0px">
+    💻Please connet first<button id="connect">connect</button>
+    <div style="position:absolute;left:40%;top:0px">
+      💡Please register once<button id="reg">register</button>
+    </div>
+    <div style="size:1cm;background:#DDDDDD;position:absolute;left:80%;top:-5px">
+      💴your ZJUcoin<br>
+
+      <label id="zjucoin"></label>
+      $
+      <br>
+      <button id="getbalance">update Balance</button>
+    </div>
+    <div style="background:#DDDDDD;position:absolute;left:80%;top:80px">📕your proposals
+      <button id="update">update</button>
+      <div id="proposals" style="font-size:5px;height: 400px; overflow-x:scroll;">
       </div>
-      <div  style="size:1cm;background:#DDDDDD;position:absolute;left:80%;top:-5px">
-        💴your ZJUcoin<br>
-        
-        <label  id="zjucoin"></label>
-        $
-        <br>
-        <button id="getbalance">update Balance</button>
-      </div>
-      <div style="background:#DDDDDD;position:absolute;left:80%;top:80px" >📕your proposals
-        <button id="update">update</button>
-        <div id="proposals" style="height: 400px; overflow-x:scroll;">
-        </div>
       </label>
     </div>
+    <div style="background:#DDDDDD;position:absolute;left:50%;top:55px">query proposals<br>
+      <input id="proid"  placeholder="Proposal's Id" />
+      <button id="query">query</button>
+      <div id="querycontent" style="font-size:5px;width: 200px;height: 150px; overflow-x:scroll;">
+      </div>
+    </div>
 
-    
-    
+
     <P></P>🗳Vote any proposal
-    <P></P><input  id="index" placeholder="Voting Proposal's index" />
-    <input  id="side" placeholder="Your side" />
+    <P></P><input id="index" placeholder="Voting Proposal's index" />
+    Choose your side
+    <input type="checkbox" id="side" checked />
     <button id="vote">vote</button>
     <P></P>📚Please enter your proposal
-    <P></P><input id="starttime" type="datetime-local"/>
-    <P></P><input id="endtime" type="datetime-local"/>
+    <P></P><input id="starttime" type="datetime-local" />
+    <P></P><input id="endtime" type="datetime-local" />
     <P></P><input id="name" placeholder="Proposal's Name" />
-    <P></P><textarea id="content"  placeholder="Proposal's Content"></textarea>
+    <P></P><textarea id="content" placeholder="Proposal's Content"></textarea>
     <button id="pro">pro</button>
 
-    
+
     <!-- <form> -->
     <P></P>
-      <div title="Debug-Log" id="debug" style="font-size:5px;width: 700px;height: 500px; overflow-x:scroll;background:#ffffff;">
-      </div>
+    <div title="Debug-Log" id="debug"
+      style="font-size:5px;width: 600px;height: 300px; overflow-x:scroll;background:#ffffff;">
+    </div>
 
-  </body>
-  <script src="./index.js" type="module"></script>
+</body>
+<script src="./index.js" type="module"></script>
 
 
 

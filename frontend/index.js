@@ -11,9 +11,11 @@ const _update = document.getElementById("update")
 const _getbalance = document.getElementById("getbalance")
 const _proposals = document.getElementById("proposals")
 const _zjucoin = document.getElementById("zjucoin")
+const _query = document.getElementById("query")
 //注册点击事件
 _connect.onclick = connect
 _register.onclick = reg
+_query.onclick=query
 _vote.onclick = vote
 _pro.onclick = pro
 _update.onclick = update
@@ -37,7 +39,7 @@ const addEventWatchTx = async () => {
     fromBlock: 0
   }, function (error, event) { })
     .on('data', function (event) {
-      console.log("12"); 
+      console.log("12");
       console.log(event); // same results as the optional callback above
     })
     .on('changed', function (event) {
@@ -95,6 +97,34 @@ async function reg() {//done
     debug.innerHTML = "Please install MetaMask"
   }
 }
+//查询提案
+async function query() {
+  console.log("began query")
+  if (typeof window.ethereum !== "undefined") {
+    const provider = new ethers.providers.Web3Provider(window.ethereum)
+    try {
+      const signer = provider.getSigner()
+      const contract = new ethers.Contract(contractAddress, abi, signer)
+      const id=document.getElementById("proid").value
+      //调用
+      const s=await contract.query(id)
+      //输出
+      document.getElementById("querycontent").innerHTML=s
+    }
+    catch (error) {
+      console.log(error)
+      if (error.data) {
+        debug.innerHTML += "<br>"
+        debug.innerHTML += error.data.message
+      }
+      return;
+    }
+   }
+  else {
+    withdrawButton.innerHTML = "Please install MetaMask"
+    debug.innerHTML = "Please install MetaMask"
+  }
+}
 //投票
 async function vote() {//done
   if (typeof window.ethereum !== "undefined") {
@@ -104,8 +134,8 @@ async function vote() {//done
       const contract = new ethers.Contract(contractAddress, abi, signer)
       //得到输入框值
       const _index = document.getElementById("index").value
-      const _side = document.getElementById("side").value
-      await contract.vote(_index,_side)
+      const _side = document.getElementById("side").checked
+      await contract.vote(_index, _side)
 
     } catch (error) {
       console.log(error)
@@ -142,22 +172,23 @@ async function pro() {
       const _name = document.getElementById("name").value
       const _content = document.getElementById("content").value
       //调用
-    //   const s = await contract.createProposal(_starttime, Math.max(_endtime - _starttime, 60), _name, _content)
-    //   //输出
-    //  console.log(s)
-    console.log(await myContract.methods.createProposal().call())
+        const s = await contract.createProposal(_starttime, Math.max(_endtime - _starttime, 60), _name, _content)
+        //输出
+      // console.log(await myContract.methods.createProposal().call())
+      contract.on("Created",(index,event)=>{
+        console.log(ethers.BigNumber.from(index).toNumber())
+        debug.innerHTML = "propose of index "+ethers.BigNumber.from(index).toNumber()+" created successfullly!"
+      });
     }
     catch (error) {
       console.log(error)
       if (error.data) {
         debug.innerHTML += "<br>"
-        debug.innerHTML += toString(error).data.message
+        debug.innerHTML += error.data.message
       }
       return;
     }
-    debug.innerHTML += "<br>"
-    debug.innerHTML += "propose successfullly!"
-  }
+   }
   else {
     withdrawButton.innerHTML = "Please install MetaMask"
     debug.innerHTML = "Please install MetaMask"
@@ -170,51 +201,90 @@ async function update() {
     try {
       const signer = provider.getSigner()
       const contract = new ethers.Contract(contractAddress, abi, signer)
-      console.log(await myContract.methods.update().call())
-      // const s = await contract.update();
-      // console.log(s);
-    }
+      
+      await contract.update()
+      //监听
+      contract.on("Approved",(index,name,event)=>{
+        console.log(index,name)
+        debug.innerHTML += "<br>you proposal NO."+ethers.BigNumber.from(id).toNumber()+" has been approved"
+        
+      });
+      contract.on("Denied",(index,name,event)=>{
+        console.log(index,name)
+        debug.innerHTML += "<br>you proposal NO."+ethers.BigNumber.from(id).toNumber()+" has been denied"
+      });
+      contract.on("getAward",(name,id,event)=>{
+        debug.innerHTML = "<br> Congradulations! Ur awarded with a ERC721 which id is :"
+        debug.innerHTML += ethers.BigNumber.from(id).toNumber()
+      });
+      contract.on("Update",(cnt,pro,event)=>{
+        _proposals.innerHTML=""
+        console.log(cnt)
+        console.log(pro)
+        debug.innerHTML += "<br>update successfullly!"
+        for(var i=0;i<ethers.BigNumber.from(cnt).toNumber();i++){
+          var pstate=""
+          switch (pro[i][6]) {
+            case 0:
+              pstate="pending"
+              break;
+            case 1:
+              pstate="approved"
+              break;
+            case 2:
+              pstate="denied"
+              break;
+            default:
+              break;
+          }
+          var d=new Date((ethers.BigNumber.from(pro[i][2]).toNumber()+ethers.BigNumber.from(pro[i][3]).toNumber())*1000)
+          _proposals.innerHTML += "id :"+ethers.BigNumber.from(i).toNumber()+"<br> name :" + pro[i][4] + "<br> content : "+pro[i][5]+"<br> endtime : "+d+"<br> state : "+pstate+"<br>--------------<br>"
+        }
+      
+      });
+      }
+      
     catch (error) {
-      console.log(error)
-      if (error.data) {
-        debug.innerHTML += "<br>"
-        debug.innerHTML += error.data.message
+        console.log(error)
+        if (error.data) {
+          debug.innerHTML += "<br>"
+          debug.innerHTML += error.data.message
+        }
+        return;
       }
-      return;
-    }
-    debug.innerHTML += "<br>"
-    debug.innerHTML += "update successfullly!"
-  }
-  else {
-    balanceButton.innerHTML = "Please install MetaMask"
-    debug.innerHTML = "Please install MetaMask"
-  }
-}
-async function getbalance() {//done
-  if (typeof window.ethereum !== "undefined") {
-    const provider = new ethers.providers.Web3Provider(window.ethereum)
-    try {
-      const signer = provider.getSigner()
-      const contract = new ethers.Contract(contractAddress, abi, signer)
-      const s=await contract.getBalance()
-      console.log(s);
-      _zjucoin.innerHTML=parseInt(s._hex, 16)
-    } catch (error) {
-      console.log(error)
-      if (error.data) {
-        debug.innerHTML += "<br>"
-        debug.innerHTML += error.data.message
-      }
-      return;
-    }
-    debug.innerHTML += "<br>"
-    debug.innerHTML += "update balance successfullly!"
 
-  }
+      
+    }
   else {
-    withdrawButton.innerHTML = "Please install MetaMask"
-    debug.innerHTML = "Please install MetaMask"
+      balanceButton.innerHTML = "Please install MetaMask"
+      debug.innerHTML = "Please install MetaMask"
+    }
   }
-}
-addEventWatchTx()
+  //获取tokens
+  async function getbalance() {//done
+    if (typeof window.ethereum !== "undefined") {
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      try {
+        const signer = provider.getSigner()
+        const contract = new ethers.Contract(contractAddress, abi, signer)
+        const s = await contract.getBalance()
+        console.log(s);
+        _zjucoin.innerHTML = parseInt(s._hex, 16)
+      } catch (error) {
+        console.log(error)
+        if (error.data) {
+          debug.innerHTML += "<br>"
+          debug.innerHTML += error.data.message
+        }
+        return;
+      }
+      debug.innerHTML += "<br>"
+      debug.innerHTML += "update balance successfullly!"
+
+    }
+    else {
+      withdrawButton.innerHTML = "Please install MetaMask"
+      debug.innerHTML = "Please install MetaMask"
+    }
+  }
 

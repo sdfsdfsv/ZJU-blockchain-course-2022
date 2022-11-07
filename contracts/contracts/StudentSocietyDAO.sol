@@ -56,7 +56,7 @@ contract StudentSocietyDAO {
     event Approved(uint64 i,string name);
     event Denied(uint64 i,string name);
     event getAward(address player, uint256 id);
-
+    event Update(uint64 count, Proposal[20] p);
     //数据数值
     uint64 public constant ProCost = 5;
     uint64 public constant ProReward = 20;
@@ -133,7 +133,9 @@ contract StudentSocietyDAO {
         return "Create proposal success";
     }
 
-
+    function query(uint32 i) public view returns(string content) {
+        return proposals[i].content;
+    }
     //投票 i--投的提案序号， support--是否支持
     function vote(uint32 i, bool support) public returns(string memory) {
         require(0<=i&&i<idx, "Proposal not exist!");
@@ -161,7 +163,7 @@ contract StudentSocietyDAO {
         return studentERC20.balanceOf(msg.sender);
     }
 
-    function update() public returns(uint64 , Proposal[20] memory, uint256){
+    function update() public{
         Proposal[20] memory ret;
         uint64 i=0;
         uint64 reti=0;
@@ -172,6 +174,8 @@ contract StudentSocietyDAO {
             //更新自己的提案状态
             if(p.proposer!=msg.sender)continue;
             //如果提案还在进行且时间已过
+            ret[reti]=p;
+            reti++;
             if (p.state == pstate.pending && block.timestamp > p.startTime + p.duration) {
                 //赞成大于反对通过
                 if (p.pros> p.cons) {
@@ -191,11 +195,10 @@ contract StudentSocietyDAO {
                     p.state = pstate.denied;
                     emit Denied(i,p.name);
                 }
-                ret[reti]=p;
-                reti++;
+                
                 proposals[i]=p;
             }
         }
-        return (reti, ret, awardid);
+        emit Update(reti,ret);
     }
 }
