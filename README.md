@@ -86,7 +86,14 @@ function query(uint32 i) public view returns(string content) {
 
 #### 4.点击vote按钮，输入想投的提案id，并框选是否支持，进行投票，每次消耗1枚Zjucoin
 调用合约的vote函数，检查边界条件，无误后进行投票，voters mapping写入该用户投票状态，每人只能投每提案一下
-
+```
+//时间对
+require(block.timestamp < p.startTime + p.duration, "Note the time to vote this!");
+//没投
+require(voters[i][msg.sender]==false, "Has been voted");
+//余额够
+require(studentERC20.balanceOf(msg.sender) >= VoteCost, "Insufficient vote token");
+```
 #### 5.查看拥有的Zjucoin
 也是直接通过返回值取得
 
@@ -111,7 +118,27 @@ function query(uint32 i) public view returns(string content) {
       });
       contract.on("Update",(cnt,pro,event)=>{
 ```
+erc721会给用户一个id，每次生成后id会加1
+```
+MyERC721 public award;
+//有3个则得到奖励，写入区块
+if (Pnum[p.proposer] == 3) {
+awardid = award.awardItem(p.proposer);
+awards[p.proposer] = awardid;
+Pnum[p.proposer] == 0;
+emit getAward(p.proposer, awardid);
+}
+```
+```
+function awardItem(address player) public returns(uint256) {
+        _tokenIds.increment();
+        uint256 newItemId = _tokenIds.current();
+        _mint(player, newItemId);
 
+        emit award(player, newItemId);
+        return newItemId;
+    }
+```
 
 ## 项目运行截图
 
