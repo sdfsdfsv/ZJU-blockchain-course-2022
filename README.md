@@ -50,6 +50,10 @@
 
 ### 6.点击update按钮，让合约更新自己的提案，处理已到期的提案，以及可能获得的ERC721奖励
 ![image](https://user-images.githubusercontent.com/82871660/200318023-d0540395-ae13-4743-910e-18a6c4596591.png)
+![image](https://user-images.githubusercontent.com/82871660/200321563-c58e8b52-dae2-454d-a75e-2963dd3e9e5a.png)
+哈哈哈哈，比较简陋，其实应该加个blocktimehash随机一下，实在没时间了，最近真的真的真的一堆事
+![image](https://user-images.githubusercontent.com/82871660/200321660-d61ab940-fafb-49bb-b898-1cb520a7700c.png)
+
 
 ## 参考内容
 
