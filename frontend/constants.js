@@ -1,4 +1,5 @@
 export const contractAddress="0xCa7F7F654b9556468A78998f04F2f71878e5C6A5"
+export const testurl="http://localhost:7545"
 export const abi=[
   {
     "inputs": [],

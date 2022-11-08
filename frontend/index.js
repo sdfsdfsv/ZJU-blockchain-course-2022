@@ -1,6 +1,6 @@
 import { ethers } from "./ethers-5.6.esm.min.js"
 //合约abi address
-import { abi, contractAddress } from "./constants.js"
+import { abi, contractAddress,testurl } from "./constants.js"
 
 //获取前端按钮
 const _connect = document.getElementById("connect")
@@ -27,26 +27,9 @@ if (typeof web3 !== 'undefined') {
   web3 = new Web3(web3.currentProvider);
 } else {
   web3 = new Web3(new Web3.providers
-    .HttpProvider("http://localhost:7545"));
+    .HttpProvider(testurl));
 }
 
-//创建合约实例
-const myContract = new web3.eth.Contract(abi, contractAddress);
-
-const addEventWatchTx = async () => {
-  contractInstance.events.Created({
-    filter: {},
-    fromBlock: 0
-  }, function (error, event) { })
-    .on('data', function (event) {
-      console.log("12");
-      console.log(event); // same results as the optional callback above
-    })
-    .on('changed', function (event) {
-      console.log('emove event from local database');
-    })
-    .on('error', console.error);
-}
 //连接metamask
 async function connect() {//done
   //判断metamask是否安装Web3
@@ -174,7 +157,6 @@ async function pro() {
       //调用
         const s = await contract.createProposal(_starttime, Math.max(_endtime - _starttime, 60), _name, _content)
         //输出
-      // console.log(await myContract.methods.createProposal().call())
       contract.on("Created",(index,event)=>{
         console.log(ethers.BigNumber.from(index).toNumber())
         debug.innerHTML = "propose of index "+ethers.BigNumber.from(index).toNumber()+" created successfullly!"
@@ -196,6 +178,7 @@ async function pro() {
 }
 //更新提案状态
 async function update() {
+  
   if (typeof window.ethereum !== "undefined") {
     const provider = new ethers.providers.Web3Provider(window.ethereum)
     try {
@@ -221,7 +204,7 @@ async function update() {
         _proposals.innerHTML=""
         console.log(cnt)
         console.log(pro)
-        debug.innerHTML += "<br>update successfullly!"
+        
         for(var i=0;i<ethers.BigNumber.from(cnt).toNumber();i++){
           var pstate=""
           switch (pro[i][6]) {
@@ -252,7 +235,7 @@ async function update() {
         }
         return;
       }
-
+      debug.innerHTML += "<br>update successfullly!"
       
     }
   else {
